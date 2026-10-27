@@ -1,0 +1,71 @@
+<UserControl x:Class="AudioScribe.App.Views.TranscriptResultView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Kopfzeile + Export-Werkzeugleiste -->
+        <StackPanel Grid.Row="0">
+            <ui:TextBlock FontTypography="TitleLarge" Text="Transkript" />
+            <WrapPanel Margin="0,10,0,6">
+                <ui:Button Appearance="Primary" Content="Kopieren für LLM-Agent"
+                           Command="{Binding CopyForLlmCommand}"
+                           ToolTip="Agent-Ready-Markdown (Absätze pro Sprecher, Pausen &lt; 3 s zusammengefasst)" />
+                <ui:Button Content="Markdown (.md)" Margin="8,0,0,0" Command="{Binding SaveMarkdownCommand}" />
+                <ui:Button Content="Text (.txt)" Margin="8,0,0,0" Command="{Binding SaveTextCommand}" />
+                <ui:Button Content="Untertitel (.srt)" Margin="8,0,0,0" Command="{Binding SaveSubRipCommand}" />
+                <ui:Button Content="Session (.json)" Margin="8,0,0,0" Command="{Binding SaveJsonCommand}"
+                           ToolTip="Volles Schema inkl. Wort-Zeitstempeln" />
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Virtualisierte Segmentliste (Recycling) -->
+        <ListBox Grid.Row="1"
+                 ItemsSource="{Binding Segments, Mode=OneWay}"
+                 ScrollViewer.CanContentScroll="True"
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 BorderThickness="0" Background="Transparent"
+                 HorizontalContentAlignment="Stretch">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                            CornerRadius="6" Padding="10,6" Margin="0,0,0,6">
+                        <TextBlock TextWrapping="Wrap" FontSize="14" LineHeight="21">
+                            <Run Text="{Binding TimestampLabel, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            <Run Text=" " />
+                            <Run Text="{Binding DisplaySpeakerName, Mode=OneWay}" FontWeight="SemiBold" />
+                            <Run Text=": " />
+                            <Run Text="{Binding Text, Mode=OneWay}" />
+                        </TextBlock>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Statuszeile -->
+        <Grid Grid.Row="2" Margin="0,8,0,0">
+            <ui:TextBlock FontTypography="Caption" Opacity="0.8" Text="{Binding StatusText}"
+                          HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="640" />
+            <ui:Button Content="Neue Transkription" HorizontalAlignment="Right" Click="OnBackClick" />
+        </Grid>
+    </Grid>
+</UserControl>

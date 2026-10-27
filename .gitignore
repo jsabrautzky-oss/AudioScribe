@@ -1,0 +1,42 @@
+# Python & Environments
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# C# / .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Builds, Installer & Binaries
+dist/
+build/
+*.exe
+*.zip
+*.dll
+installer/Output/
+
+# Lokale Modelle, Audio & Cache-Daten
+models/
+.cache/
+audio_previews/
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac
+*.mp3.writing
+*.writing.mp3
+hf_token.txt
+appsettings.local.json
+cuda_package_url.txt
+sessions/
+AppData/
+*.log
+*.bak
+.tmpdl/
+Y/

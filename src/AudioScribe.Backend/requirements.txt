@@ -1,0 +1,12 @@
+ctranslate2>=4.5.0,<5
+faster-whisper>=1.2.0,<2
+whisperx==3.8.6
+pyannote-audio>=3.3,<5
+pydub>=0.25.1
+mutagen>=1.47
+numpy>=2.1
+soundfile>=0.12
+silero-vad>=5.1
+# Hinweis: torchcodec (Transitive Abhaengigkeit von pyannote) bleibt optional —
+# die Pipeline uebergibt Waveforms als In-Memory-Dicts, Audio-Decoding laeuft
+# ueber ffmpeg-Subprozess (audio_prep) bzw. das soundfile-Backend (VAD).

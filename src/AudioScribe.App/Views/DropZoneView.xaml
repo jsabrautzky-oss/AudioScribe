@@ -1,0 +1,155 @@
+<UserControl x:Class="AudioScribe.App.Views.DropZoneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:svc="clr-namespace:AudioScribe.App.Services">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <svc:SymbolIconConverter x:Key="Sym" />
+    </UserControl.Resources>
+    <Grid AllowDrop="True">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="720" HorizontalAlignment="Center" Margin="0,12">
+
+                <!-- Drop-Zone -->
+                <Border x:Name="DropBorder" Height="190" CornerRadius="12"
+                        BorderThickness="2" BorderBrush="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        MouseLeftButtonUp="OnPickFileClick" Cursor="Hand">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="FolderDocument24" FontSize="34"
+                                     Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                        <ui:TextBlock FontTypography="Subtitle" HorizontalAlignment="Center" Margin="0,10,0,0"
+                                      Text="Audiodatei hierher ziehen" />
+                        <ui:TextBlock FontTypography="Caption" HorizontalAlignment="Center" Opacity="0.75" Margin="0,4,0,0"
+                                      Text="oder klicken zum Auswählen · .mp3 .wav .m4a .aac .flac .ogg .opus .wma" />
+                    </StackPanel>
+                </Border>
+
+                <ui:TextBlock FontTypography="Body" Margin="2,10,0,0" TextWrapping="Wrap">
+                    <Run Text="{Binding FileInfoText, Mode=OneWay}" /><Run Text="{Binding DurationText, Mode=OneWay}" />
+                </ui:TextBlock>
+                <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                              Margin="2,4,0,0" Text="{Binding ValidationMessage}" TextWrapping="Wrap" />
+
+                <!-- GPU/CUDA-Banner -->
+                <Border Margin="0,12,0,0" Padding="12,10" CornerRadius="8"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        Visibility="{Binding ShowGpuArea, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="{Binding GpuBannerMessage}" TextWrapping="Wrap" />
+
+                        <WrapPanel Margin="0,8,0,0"
+                                   Visibility="{Binding ShowGpuDownloadButton, Converter={StaticResource BoolToVis}}">
+                            <ui:Button Content="CUDA-Paket herunterladen"
+                                       Appearance="Primary"
+                                       Click="OnDownloadGpuAddonClick"
+                                       Padding="12,6" />
+                        </WrapPanel>
+
+                        <StackPanel Margin="0,8,0,0"
+                                    Visibility="{Binding ShowGpuProgress, Converter={StaticResource BoolToVis}}">
+                            <ProgressBar Height="8" Minimum="0" Maximum="100"
+                                         Value="{Binding GpuDownloadProgress, Mode=OneWay}"
+                                         IsIndeterminate="False" />
+                        </StackPanel>
+
+                        <ui:TextBlock FontTypography="Caption" Margin="0,8,0,0"
+                                      Text="{Binding GpuStatusMessage}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <!-- HF-Token -->
+                <ui:CardControl Margin="0,18,0,0"
+                                Icon="{ui:SymbolIcon DocumentKey20}">
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <!-- Kompaktzustand: Token vorhanden -->
+                        <StackPanel Margin="0,0,0,6"
+                                    Visibility="{Binding IsTokenBadgeVisible, Converter={StaticResource BoolToVis}}">
+                            <WrapPanel>
+                                <TextBlock Text="✓" FontSize="20" Margin="0,0,8,0"
+                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                <ui:TextBlock FontTypography="BodyStrong" Text="Hugging-Face-Token aktiv ✓" />
+                            </WrapPanel>
+                            <ui:TextBlock FontTypography="Caption" Opacity="0.7" Margin="28,2,0,0" TextWrapping="Wrap"
+                                          Text="Sicher als DPAPI-Eintrag in %APPDATA%\AudioScribe hinterlegt. Zum Bearbeiten oder Entfernen „Ändern“ wählen." />
+                            <WrapPanel Margin="28,8,0,0">
+                                <ui:Button Content="Ändern"
+                                           Click="OnEditTokenClick" Margin="0,0,8,6" Padding="10,6" />
+                                <ui:Button Content="❓ Hilfe"
+                                           Click="OnHelpToggleClick" Margin="0,0,8,6" Padding="10,6" />
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <!-- Bearbeiten / Ersteinrichtung -->
+                        <StackPanel Visibility="{Binding IsTokenEditPanelVisible, Converter={StaticResource BoolToVis}}">
+                            <ui:TextBlock FontTypography="BodyStrong" Text="Hugging-Face-Token für pyannote-Diarisierung" />
+
+                            <ui:TextBox x:Name="TokenBox" Margin="0,8,0,0" MinWidth="300" MaxWidth="560"
+                                        HorizontalAlignment="Stretch"
+                                        PlaceholderText="hf_..." Text="{Binding HfToken, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <CheckBox Margin="0,8,0,0" IsChecked="{Binding SaveToken}"
+                                      Content="Token lokal speichern (DPAPI-verschlüsselt in %APPDATA%\AudioScribe)" />
+
+                            <WrapPanel Margin="0,10,0,0">
+                                <ui:Button Content="1. Bedingungen freischalten ↗"
+                                           Click="OnOpenTermsClick" Margin="0,0,8,6" Padding="10,6" />
+                                <ui:Button Content="2. Token erstellen ↗"
+                                           Click="OnOpenTokenClick" Margin="0,0,8,6" Padding="10,6" />
+                                <ui:Button Content="❓ Hilfe"
+                                           Click="OnHelpToggleClick" Margin="0,0,8,6" Padding="10,6" />
+                                <ui:Button Content="Entfernen"
+                                           Click="OnRemoveTokenClick" Margin="0,0,8,6" Padding="10,6"
+                                           Visibility="{Binding IsStoredTokenSaved, Converter={StaticResource BoolToVis}}" />
+                            </WrapPanel>
+
+                            <Border Margin="0,8,0,0" Padding="10,8" CornerRadius="8"
+                                    Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                                    Visibility="{Binding IsHelpOpen, Converter={StaticResource BoolToVis}}">
+                                <ui:TextBlock FontTypography="Body" TextWrapping="Wrap" HorizontalAlignment="Stretch"
+                                              Text="1. Klicke auf „Bedingungen freischalten“ und bestätige die Nutzungsbedingungen auf Hugging Face.&#x0a;2. Klicke auf „Token erstellen“, erstelle einen kostenlosen Token (Typ: Read) und kopiere ihn.&#x0a;3. Füge den Schlüssel hier ein. AudioScribe speichert ihn sicher auf deinem PC." />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ui:CardControl>
+
+                <!-- Modell + Sprecher-Schranken -->
+                <ui:CardControl Margin="0,12,0,0"
+                                Icon="{ui:SymbolIcon Speaker224}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <ui:TextBlock FontTypography="BodyStrong" Text="Whisper-Modell" />
+                            <ComboBox Width="220" Margin="0,6,0,0" HorizontalAlignment="Left"
+                                      ItemsSource="{Binding AvailableModels}"
+                                      SelectedItem="{Binding SelectedModel}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                            <ui:TextBlock FontTypography="BodyStrong" Text="Min. Sprecher" />
+                            <ui:TextBox Width="90" Margin="0,6,0,0" Text="{Binding MinSpeakersText, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="auto" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Margin="12,0,0,0">
+                            <ui:TextBlock FontTypography="BodyStrong" Text="Max. Sprecher" />
+                            <ui:TextBox Width="90" Margin="0,6,0,0" Text="{Binding MaxSpeakersText, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="auto" />
+                        </StackPanel>
+                    </Grid>
+                </ui:CardControl>
+
+                <ui:Button x:Name="StartButton" Margin="0,22,0,8" HorizontalAlignment="Center"
+                           Appearance="Primary" FontSize="16" Padding="28,10"
+                           Content="Transkription starten"
+                           IsEnabled="{Binding CanStart}"
+                           Click="OnStartClick" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

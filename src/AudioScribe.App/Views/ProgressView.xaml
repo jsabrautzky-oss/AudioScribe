@@ -1,0 +1,68 @@
+<UserControl x:Class="AudioScribe.App.Views.ProgressView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+
+    <Grid MaxWidth="760" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel>
+            <ui:TextBlock FontTypography="TitleLarge" Text="Verarbeitung" HorizontalAlignment="Center" />
+
+            <!-- Phasen-Stepper -->
+            <Grid Margin="0,20,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border x:Name="Step0" Grid.Column="0" CornerRadius="8" Padding="8,10"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                    <ui:TextBlock FontTypography="BodyStrong" HorizontalAlignment="Center" Text="1 · Audioanalyse" />
+                </Border>
+                <Border x:Name="Step1" Grid.Column="2" CornerRadius="8" Padding="8,10"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                    <ui:TextBlock FontTypography="BodyStrong" HorizontalAlignment="Center" Text="2 · Transkription" />
+                </Border>
+                <Border x:Name="Step2" Grid.Column="4" CornerRadius="8" Padding="8,10"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                    <ui:TextBlock FontTypography="BodyStrong" HorizontalAlignment="Center" Text="3 · Sprechererkennung" />
+                </Border>
+                <Border x:Name="Step3" Grid.Column="6" CornerRadius="8" Padding="8,10"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                    <ui:TextBlock FontTypography="BodyStrong" HorizontalAlignment="Center" Text="4 · Vorbereitung" />
+                </Border>
+            </Grid>
+
+            <ProgressBar Height="10" Margin="0,14,0,6"
+                         Value="{Binding OverallPercent, Mode=OneWay}"
+                         Maximum="100" Minimum="0" />
+            <ui:TextBlock FontTypography="Body" HorizontalAlignment="Center" TextWrapping="Wrap"
+                          Text="{Binding PhaseMessage, Mode=OneWay}" />
+            <ui:TextBlock FontTypography="Caption" Opacity="0.7" Margin="0,6,0,0" TextWrapping="Wrap"
+                          HorizontalAlignment="Center" Text="{Binding InfoText, Mode=OneWay}" />
+
+            <!-- Fehlerbanner -->
+            <Border Margin="0,18,0,0" CornerRadius="8" Padding="12"
+                    Background="{DynamicResource SystemFillColorCriticalBackgroundBrush}"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
+                <ui:TextBlock FontTypography="Body" TextWrapping="Wrap"
+                              Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                              Text="{Binding ErrorText, Mode=OneWay}" />
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
+                <ui:Button x:Name="CancelButton" Appearance="Danger" Content="Abbrechen"
+                           Click="OnCancelClick" Visibility="Collapsed" />
+                <ui:Button x:Name="BackButton" Margin="12,0,0,0" Content="Zurück zum Start"
+                           Click="OnBackClick" Visibility="Collapsed" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
