@@ -137,27 +137,50 @@ dotnet build AudioScribe.sln
 Die App nutzt im Dev-Modus automatisch
 `src\AudioScribe.Backend\.venv\Scripts\python.exe`.
 
+### Backend-EXE für den Installer bauen
+
+```bat
+build\build_backend.bat
+```
+
+Ergebnis: `dist\AudioScribe\backend\audioscribe-backend.exe` (PyInstaller-Bundle, CPU-only).
+
 ### Installer bauen
 
 ```bat
 build\create_installer.bat
 ```
 
-Ergebnis: `dist\AudioScribe-Setup.exe`.
+Ergebnis: `dist\AudioScribe-Setup-v<Version>.exe` (Name wird über `OutputBaseFilename`
+in `installer/setup.iss` gesteuert). Das Backend aus `dist\AudioScribe\backend` wird
+automatisch mitgepackt.
 
 ## GPU-CUDA-Addon
 
-Das Basis-Setup enthält bewusst keine schweren CUDA-/cuDNN-DLLs. Für NVIDIA-Systeme
-kann in der App ein GPU-Add-on heruntergeladen werden. Die App erkennt NVIDIA-GPUs
-über WMI und zeigt bei fehlender CUDA-Runtime einen Download-Bereich an.
+Das Basis-Setup enthält bewusst keine schweren CUDA-/cuDNN-DLLs, und das gebündelte
+Backend läuft standardmäßig auf der CPU. Für NVIDIA-Systeme kann in der App ein
+GPU-Add-on heruntergeladen werden. Die App erkennt NVIDIA-GPUs über WMI und zeigt
+bei fehlender CUDA-Runtime einen Download-Bereich an.
 
-Für die Download-URL kann eine Datei `cuda_package_url.txt` neben der `AudioScribe.exe`
-angelegt werden. Sie enthält die URL zu einem ZIP-Archiv mit den CUDA-/cuDNN-DLLs.
-
-Beispiel:
+Die Download-URL ist fest im Client hinterlegt und zeigt auf das öffentliche
+Prerelease `cuda-runtime` dieses Repositories:
 
 ```text
-https://example.com/audioscribe-cuda-windows-x64.zip
+https://github.com/jsabrautzky-oss/AudioScribe/releases/download/cuda-runtime/audioscribe-cuda-windows-x64.zip
+```
+
+Diese URL kann ohne Neon-Neubau überschrieben werden, z. B. für Tests. Die App prüft
+in dieser Reihenfolge:
+
+1. Umgebungsvariable `AUDIOSCRIBE_CUDA_PACKAGE_URL`
+2. Datei `cuda_package_url.txt` neben der `AudioScribe.exe`
+3. Datei `%APPDATA%\AudioScribe\cuda_package_url.txt`
+
+Eine Beispielvorlage liegt im Repo unter `cuda_package_url.example.txt`. Die Override-Datei
+enthält eine einzelne URL pro Zeile, z. B.:
+
+```text
+https://github.com/jsabrautzky-oss/AudioScribe/releases/download/cuda-runtime/audioscribe-cuda-windows-x64.zip
 ```
 
 ## Modell-Caches
