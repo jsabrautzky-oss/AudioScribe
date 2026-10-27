@@ -13,8 +13,12 @@ obj/
 *.suo
 
 # Builds, Installer & Binaries
+# Achtung: build/ enthaelt auch Build-Skripte; nur die Build-Artefakte ignorieren.
 dist/
-build/
+build/*
+!build/*.bat
+!build/*.ps1
+!build/*.md
 *.exe
 *.zip
 *.dll
