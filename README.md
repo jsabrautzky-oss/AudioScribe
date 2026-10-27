@@ -1,21 +1,26 @@
-# AudioScribe
+# 🎙️ AudioScribe
 
-AudioScribe ist eine lokale Windows-App für lange Audioaufnahmen: Transkription,
-Sprechertrennung (Diarisierung), Sprecher-Vorschau und Exporte. Die Verarbeitung
-läuft vollständig lokal, ohne Cloud-Zwang.
+> Lokale KI-Transkription & Multi-Sprecher-Erkennung für Windows. Optimiert für Deutsch, 1-Klick-Installation und direkter Multi-Format-Export (LLM-Prompt, Markdown, TXT, SRT, JSON).
 
-## Features
+---
 
-- WhisperX/faster-whisper Transkription mit Wort-Timestamps
-- Pyannote Diarisierung für Sprechertrennung
-- Optionale lokale CUDA-Beschleunigung mit automatischem CPU-Fallback
-- CPU-Modus als schlanke Basisinstallation
-- GPU-Add-on-Download in der App für NVIDIA-Systeme
-- Sprecher-Kacheln mit Audio- und Text-Vorschau
-- Live-Umbenennung von Sprechern im Transkript
-- Exporte als Markdown, TXT, SRT und JSON
-- Zentrale, deinstallierbare Modell-Caches unter `%ProgramData%\AudioScribe`
-  bzw. `%APPDATA%\AudioScribe` im Dev-Modus
+## Über AudioScribe
+
+**AudioScribe** verwandelt Audioaufnahmen vollautomatisch in präzisen, strukturierten Text mit sekundengenauer Sprecherzuordnung (*Diarisierung*) – maßgeschneidert für die **deutsche Sprache** und vorbereitet für die direkte Weiterverarbeitung in modernen KI-Workflows.
+
+### Highlights & Features
+
+* **Kinderleichte 1-Klick-Installation:** Schlüsselfertiges Windows-Setup. Kein manuelles Einrichten von Python, kein Terminal und keine externen Abhängigkeiten.
+* **Multi-Sprecher-Erkennung:** Automatische Unterscheidung einzelner Stimmen mit integrierter Audio- und Text-Hörprobe zur schnellen Zuordnung.
+* **Optimiert für LLMs & KI-Agenten:** Die Schaltfläche *„Kopieren für LLM-Agent“* formatiert das Transkript samt Zeitstempeln und Sprechernamen so, dass es ohne Nachbearbeitung direkt in ChatGPT, Claude oder lokale Modelle für Protokolle, Zusammenfassungen oder To-do-Listen übergeben werden kann.
+* **Flexible Exportformate:** Ein Klick genügt für den Export in gängige Formate:
+  * **Markdown (`.md`)** – lesbar strukturiert mit Sprecher-Headern
+  * **Reiner Text (`.txt`)** – kompakt und übersichtlich
+  * **Untertitel (`.srt`)** – sekundengenau synchronisiert für Videoschnitt und Player
+  * **Session (`.json`)** – maschinenlesbare Rohdaten mit allen Timestamps für Entwickler
+* **100 % lokal & datenschutzfreundlich:** Alle Berechnungen laufen vollständig auf der eigenen Hardware (NVIDIA CUDA-Beschleunigung oder CPU-Fallback). Keine Cloud-Dienste, keine Abo-Modelle, vollständige Datensouveränität.
+
+---
 
 ## Stack
 
