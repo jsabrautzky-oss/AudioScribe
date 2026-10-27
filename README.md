@@ -22,6 +22,29 @@
 
 ---
 
+## 💡 Hinweise für Tester & Erste Schritte
+
+Da sich AudioScribe aktuell im **Alpha-Stadium (v0.1.0)** befindet, beachte bitte folgende Hinweise bei der ersten Nutzung:
+
+
+### 1. Windows SmartScreen-Meldung
+* Beim ersten Start des Installers meldet Windows möglicherweise: *„Der Computer wurde durch Windows geschützt“*.
+* **Hintergrund:** Die Vorabversion besitzt noch kein kostenpflichtiges Code-Signing-Zertifikat.
+* **Lösung:** Klicke einfach auf **„Weitere Informationen“** und anschließend auf **„Trotzdem ausführen“**.
+
+
+### 2. Performance: CPU vs. GPU (NVIDIA CUDA)
+* **Mit NVIDIA-Grafikkarte (RTX / GTX):** Über den Button in der App kann das optionale CUDA-Paket geladen werden. Die Transkription läuft dann mit bis zu 10- bis 20-facher Echtzeit.
+* **Reiner CPU-Modus (z. B. Büro-PCs / Laptops):** Die App läuft vollkommen stabil auch ohne Grafikkarte. Die Verarbeitung dauert auf Standard-CPUs jedoch spürbar länger (in etwa 1:1 zur Länge der Audiodatei). 
+* *Tipp für den ersten Funktionstest:* Nutze am besten eine kurze Testdatei von 30 bis 60 Sekunden.
+
+
+### 3. Hugging-Face-Token beim ersten Start
+* Für die Sprechertrennung (*Pyannote Diarization*) ist beim ersten Ausführen ein kostenloser Hugging-Face-Token erforderlich, um die Modellgewichte in den lokalen Cache zu laden.
+* Nach dem einmaligen Download arbeitet die Anwendung zu 100 % offline.
+
+---
+
 ## Stack
 
 - Frontend: C# / .NET 9 WPF, WPF-UI, CommunityToolkit.Mvvm
