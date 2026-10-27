@@ -17,6 +17,9 @@ public interface IGpuAddonService
 /// <summary>Lädt ein optionales CUDA-Runtime-Zip und entpackt es in den Engine-Ordner.</summary>
 public sealed class GpuAddonService : IGpuAddonService
 {
+    private const string DefaultPackageUrl =
+        "https://github.com/jsabrautzky-oss/AudioScribe/releases/download/cuda-runtime/audioscribe-cuda-windows-x64.zip";
+
     private readonly HardwareDetectorService _hardware;
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromMinutes(45) };
 
@@ -153,7 +156,7 @@ public sealed class GpuAddonService : IGpuAddonService
             }
         }
 
-        return null;
+        return DefaultPackageUrl;
     }
 
     private void Report(double percent, string message) =>
