@@ -45,6 +45,42 @@ Da sich AudioScribe aktuell im **Alpha-Stadium (v0.1.0)** befindet, beachte bitt
 
 ---
 
+## 🎙️ Tipps für optimale Audioaufnahmen & beste Erkennung
+
+Die Erkennungsgenauigkeit von WhisperX und die Präzision der Sprechertrennung (Pyannote) hängen stark von der Qualität der Audio-Quelldatei ab. 
+
+### ⚙️ Die idealen Aufnahme-Einstellungen
+
+* **Abtastrate (Sample Rate): 16 kHz (16.000 Hz)**  
+  * **Warum?** Die zugrundeliegenden KI-Modelle (Whisper und Wav2Vec2) arbeiten intern nativ mit **16 kHz Mono**. Höhere Raten (wie 44,1 kHz oder 48 kHz) bringen für Sprache keinen Genauigkeitsvorteil. Liegt das Audio bereits in 16 kHz vor, entfällt das softwareseitige Resampling beim Einlesen – das beschleunigt den Startvorgang messbar.
+* **Kanäle: Mono**  
+  * Ein Kanal reicht für Sprachaufnahmen vollkommen aus. Stereo verdoppelt lediglich das Datenvolumen, ohne der Spracherkennung Mehrwert zu bieten.
+* **Dateiformat: MP3 (oder M4A) mit 64 bis 128 kbps**  
+  * **Warum?** MP3 bietet die perfekte Balance aus Sprachklarheit und minimaler Dateigröße. Ein einstündiges Meeting belegt bei 64 kbps MP3 lediglich rund **25 bis 30 MB** Speicherplatz, lässt sich blitzschnell laden und schont den Arbeitsspeicher.
+
+---
+
+### 📱 Getestete Empfehlung: Easy Voice Recorder Pro
+
+Für Smartphone-Aufnahmen hat sich **Easy Voice Recorder Pro** (Android / iOS) in der Praxis bewährt.
+
+**Empfohlenes Setup in der App:**
+* **Format:** MP3
+* **Abtastrate (Sample Rate):** `16 kHz` (in den Audio-Einstellungen)
+* **Kanäle:** `Mono`
+* **Kodierungsqualität:** `Standard` (ca. 64–96 kbps)
+* **Mikrofon:** *Standard* oder *Hauptmikrofon (unbearbeitet)*
+
+---
+
+### 💡 Praxistipps für perfekte Sprecherzuordnung (Diarisierung)
+
+* **Smartphone zentrieren:** Das Gerät flach und mittig auf dem Besprechungstisch platzieren, damit alle Teilnehmenden mit ähnlichem Pegel erfasst werden.
+* **Wortmeldungen ausreden lassen:** Pyannote trennt Stimmen am zuverlässigsten, wenn die Sprecher sich nicht ständig gegenseitig ins Wort fallen.
+* **Tisch-Vibrationen meiden:** Das Handy nicht direkt neben eine klappernde Laptoptastatur oder auf ein vibrierendes Notebook legen.
+
+---
+
 ## Stack
 
 - Frontend: C# / .NET 9 WPF, WPF-UI, CommunityToolkit.Mvvm
