@@ -46,10 +46,10 @@ exit /b 1
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
 echo Compiling installer with: "%ISCC%"
-"%ISCC%" /O"%OUT_DIR%" /F"AudioScribe-Setup-v0.1.0" "%SETUP_SCRIPT%"
+"%ISCC%" /O"%OUT_DIR%" "%SETUP_SCRIPT%"
 if errorlevel 1 (
   echo ERROR: Inno Setup konnte nicht kompilieren.
   exit /b 1
 )
 
-echo Fertig: "%OUT_DIR%\AudioScribe-Setup-v0.1.0.exe"
+echo Fertig: Installer liegt in "%OUT_DIR%" (Dateiname siehe OutputBaseFilename in setup.iss)
