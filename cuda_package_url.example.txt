@@ -1,4 +1,6 @@
-# Kopiere diese Datei als "cuda_package_url.txt" neben die AudioScribe.exe,
-# oder lege sie unter %APPDATA%\AudioScribe\cuda_package_url.txt ab.
-# Inhalt: eine einzelne URL zu einem ZIP-Archiv mit den CUDA-/cuDNN-DLLs.
+# Override-URLs fuer das CUDA-Add-on (je Paket eine Datei, eine URL pro Zeile):
+#   cuda_package_url.txt          -> CUDA-Laufzeit (engine\cuda)
+#   cuda_backend_package_url.txt  -> GPU-Engine mit CUDA-Backend (engine\backend)
+# Ablage: neben der AudioScribe.exe (oder deren Parent-Ordner) oder in %APPDATA%\AudioScribe\
+# Alternativ: Umgebungsvariablen AUDIOSCRIBE_CUDA_PACKAGE_URL / AUDIOSCRIBE_CUDA_BACKEND_URL
 https://example.invalid/audioscribe-cuda-windows-x64.zip

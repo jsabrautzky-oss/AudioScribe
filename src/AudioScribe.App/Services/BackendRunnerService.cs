@@ -31,10 +31,13 @@ public sealed class BackendRunnerService : IBackendService
         get { lock (_gate) return _process is { HasExited: false }; }
     }
 
-    /// <summary>Auflösung des Backend-Startpunkts: PyInstaller-Binary oder venv-Python (Dev).</summary>
-    private static (string Exe, string? CliPy) ResolveBackendCommand()
+    /// <summary>Auflösung des Backend-Startpunkts: GPU-Engine (Add-on), PyInstaller-Binary oder venv-Python (Dev).</summary>
+    private (string Exe, string? CliPy) ResolveBackendCommand()
     {
         var baseDir = AppContext.BaseDirectory;
+
+        if (_hardware.HasGpuEngine && _hardware.CudaBackendExe is string gpuExe)
+            return (gpuExe, null);
 
         var exe = Path.Combine(baseDir, "backend", "audioscribe-backend.exe");
         if (File.Exists(exe))

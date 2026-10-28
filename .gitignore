@@ -39,6 +39,7 @@ audio_previews/
 hf_token.txt
 appsettings.local.json
 cuda_package_url.txt
+cuda_backend_package_url.txt
 sessions/
 AppData/
 *.log

@@ -20,6 +20,12 @@ public sealed class HardwareDetectorService
     public string NvidiaGpuName { get; private set; } = string.Empty;
     public bool HasNvidiaGpu => !string.IsNullOrWhiteSpace(NvidiaGpuName);
     public bool HasCudaRuntime { get; private set; }
+    public bool HasCudaBackend { get; private set; }
+
+    /// <summary>GPU-Engine ist vollstaendig: CUDA-Laufzeit (engine\cuda) plus CUDA-Backend (engine\backend).</summary>
+    public bool HasGpuEngine => HasCudaRuntime && HasCudaBackend;
+
+    public string? CudaBackendExe { get; private set; }
 
     public HardwareDetectorService()
     {
@@ -28,7 +34,18 @@ public sealed class HardwareDetectorService
         RefreshCudaState();
     }
 
-    public void RefreshCudaState() => HasCudaRuntime = DetectCudaRuntime();
+    public void RefreshCudaState()
+    {
+        HasCudaRuntime = DetectCudaRuntime();
+        CudaBackendExe = ResolveCudaBackendExe();
+        HasCudaBackend = CudaBackendExe is not null;
+    }
+
+    private string? ResolveCudaBackendExe()
+    {
+        var candidate = Path.Combine(EngineDirectory, "backend", "audioscribe-backend.exe");
+        return File.Exists(candidate) ? Path.GetFullPath(candidate) : null;
+    }
 
     private static string ResolveEngineDirectory()
     {

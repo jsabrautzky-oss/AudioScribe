@@ -128,7 +128,7 @@ public partial class DropZoneViewModel : ObservableObject
 
     public bool ShowGpuProgress => IsGpuAddonDownloading;
     public bool ShowGpuPrompt => HasNvidiaGpu && !HasCudaRuntime && !IsGpuAddonDownloading && _gpuAddon.HasPackageConfigured;
-    public bool ShowGpuSuccess => HasCudaRuntime;
+    public bool ShowGpuSuccess => HasNvidiaGpu && HasCudaRuntime;
     public bool ShowGpuDownloadButton => ShowGpuPrompt;
 
     public ObservableCollection<ModelOption> AvailableModels { get; } =
@@ -228,7 +228,8 @@ public partial class DropZoneViewModel : ObservableObject
     private void RefreshGpuState()
     {
         HasNvidiaGpu = _hardware.HasNvidiaGpu;
-        HasCudaRuntime = _hardware.HasCudaRuntime;
+        // "CUDA-Runtime" im View meint die einsatzbereite GPU-Engine: engine\cuda + engine\backend.
+        HasCudaRuntime = _hardware.HasGpuEngine;
         ShowGpuArea = HasNvidiaGpu;
 
         if (HasCudaRuntime)

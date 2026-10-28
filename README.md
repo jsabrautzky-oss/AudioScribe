@@ -145,6 +145,18 @@ build\build_backend.bat
 
 Ergebnis: `dist\AudioScribe\backend\audioscribe-backend.exe` (PyInstaller-Bundle, CPU-only).
 
+GPU-Engine (CUDA) für das optionale Add-on:
+
+```bat
+src\AudioScribe.Backend\.venv\Scripts\pip install pyinstaller
+build\build_backend_cuda.bat
+```
+
+Ergebnis: `dist\AudioScribe_cuda\backend\audioscribe-backend.exe` und das Add-on-Paket
+`dist\audioscribe-backend-cuda-windows-x64.zip` (Layout `backend\...`). Die CUDA-Laufzeit-DLLs
+(cuBLAS/cuDNN/…) sind bewusst nicht in diesem ZIP – sie kommen aus dem bestehenden
+Runtime-Paket `audioscribe-cuda-windows-x64.zip` (`engine\cuda`).
+
 ### Installer bauen
 
 ```bat
@@ -158,30 +170,36 @@ automatisch mitgepackt.
 ## GPU-CUDA-Addon
 
 Das Basis-Setup enthält bewusst keine schweren CUDA-/cuDNN-DLLs, und das gebündelte
-Backend läuft standardmäßig auf der CPU. Für NVIDIA-Systeme kann in der App ein
-GPU-Add-on heruntergeladen werden. Die App erkennt NVIDIA-GPUs über WMI und zeigt
-bei fehlender CUDA-Runtime einen Download-Bereich an.
+Backend läuft standardmäßig auf der CPU. Für NVIDIA-Systeme lädt die App ein
+GPU-Add-on aus zwei Paketen in den Engine-Ordner
+(`%ProgramData%\AudioScribe\engine` bzw. neben der EXE bei `portable.txt`):
 
-Die Download-URL ist fest im Client hinterlegt und zeigt auf das öffentliche
-Prerelease `cuda-runtime` dieses Repositories:
+1. **CUDA-Laufzeit** → `engine\cuda\*.dll` (cuBLAS, cuDNN, cuSOLVER, cuFFT-Runtime …)
+2. **GPU-Engine** → `engine\backend\audioscribe-backend.exe` (PyTorch mit cu128, ohne
+   cuBLAS/cuDNN-DLLs; die werden über `engine\cuda` im PATH geladen)
 
-```text
-https://github.com/jsabrautzky-oss/AudioScribe/releases/download/cuda-runtime/audioscribe-cuda-windows-x64.zip
-```
+Sind beide Pakete vorhanden, startet die App automatisch die GPU-Engine; sonst läuft das
+CPU-Backend aus dem Setup. Die App erkennt NVIDIA-GPUs über WMI und zeigt bei fehlendem
+Add-on einen Download-Bereich an.
 
-Diese URL kann ohne Neon-Neubau überschrieben werden, z. B. für Tests. Die App prüft
-in dieser Reihenfolge:
-
-1. Umgebungsvariable `AUDIOSCRIBE_CUDA_PACKAGE_URL`
-2. Datei `cuda_package_url.txt` neben der `AudioScribe.exe`
-3. Datei `%APPDATA%\AudioScribe\cuda_package_url.txt`
-
-Eine Beispielvorlage liegt im Repo unter `cuda_package_url.example.txt`. Die Override-Datei
-enthält eine einzelne URL pro Zeile, z. B.:
+Die beiden Download-URLs sind fest im Client hinterlegt:
 
 ```text
 https://github.com/jsabrautzky-oss/AudioScribe/releases/download/cuda-runtime/audioscribe-cuda-windows-x64.zip
+https://github.com/jsabrautzky-oss/AudioScribe/releases/download/v0.1.7/audioscribe-backend-cuda-windows-x64.zip
 ```
+
+Diese URLs können ohne Neu-Bau überschrieben werden, z. B. für Tests. Die App prüft
+pro Paket in dieser Reihenfolge:
+
+| Paket | Umgebungsvariable | Override-Datei |
+| --- | --- | --- |
+| CUDA-Laufzeit | `AUDIOSCRIBE_CUDA_PACKAGE_URL` | `cuda_package_url.txt` |
+| GPU-Engine | `AUDIOSCRIBE_CUDA_BACKEND_URL` | `cuda_backend_package_url.txt` |
+
+Die Override-Dateien liegen neben der `AudioScribe.exe` (oder im Parent-Ordner) bzw. unter
+`%APPDATA%\AudioScribe\` und enthalten eine einzelne URL pro Zeile. Eine Beispielvorlage
+liegt im Repo unter `cuda_package_url.example.txt`.
 
 ## Modell-Caches
 
