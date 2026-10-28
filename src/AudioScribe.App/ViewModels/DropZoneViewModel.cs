@@ -102,7 +102,19 @@ public partial class DropZoneViewModel : ObservableObject
     private string _memoryLabel = string.Empty;
 
     [ObservableProperty]
-    private double _memoryBarPercent;
+    private bool _memoryIsVram;
+
+    [ObservableProperty]
+    private double _usedMemoryGb;
+
+    [ObservableProperty]
+    private double _totalMemoryGb;
+
+    [ObservableProperty]
+    private double _usedVramGb;
+
+    [ObservableProperty]
+    private double _totalVramGb;
 
     [ObservableProperty]
     private bool _memoryWarning;
@@ -232,28 +244,34 @@ public partial class DropZoneViewModel : ObservableObject
         _ = RefreshMemoryLiveAsync();
     }
 
-    /// <summary>Setzt Label/Balken/Warnung aus dem zuletzt ermittelten RAM/VRAM-Zustand.</summary>
+    /// <summary>Setzt Label/Balken/Warnung aus dem zuletzt ermittelten RAM/VRAM-Zustand (Balken = belegter Speicher wie im Task-Manager).</summary>
     private void RefreshMemoryDisplay()
     {
+        bool showVram = UseGpuMode && _memory.HasVramInfo;
+        MemoryIsVram = showVram;
+
+        UsedMemoryGb = Math.Round(_memory.TotalMemoryGb - _memory.FreeMemoryGb, 1);
+        TotalMemoryGb = Math.Round(_memory.TotalMemoryGb, 1);
+        UsedVramGb = Math.Round(_memory.TotalVramGb - _memory.FreeVramGb, 1);
+        TotalVramGb = Math.Round(_memory.TotalVramGb, 1);
+
         double free;
-        double total;
-        if (UseGpuMode && _memory.HasVramInfo)
+        if (showVram)
         {
             free = _memory.FreeVramGb;
-            total = _memory.TotalVramGb;
-            MemoryLabel = $"Freier Grafikspeicher (VRAM): {free:0.#} GB / {total:0.#} GB";
+            double usedVram = _memory.TotalVramGb - free;
+            MemoryLabel = $"Grafikspeicher: {usedVram:F1} GB / {_memory.TotalVramGb:F1} GB belegt ({free:F1} GB frei)";
             MemoryWarningText = "Zu wenig freier VRAM für große Modelle.";
         }
         else
         {
             free = _memory.FreeMemoryGb;
-            total = _memory.TotalMemoryGb;
-            MemoryLabel = $"Freier Arbeitsspeicher (RAM): {free:0.#} GB / {total:0.#} GB";
+            double usedRam = _memory.TotalMemoryGb - free;
+            MemoryLabel = $"Arbeitsspeicher: {usedRam:F1} GB / {_memory.TotalMemoryGb:F1} GB belegt ({free:F1} GB frei)";
             MemoryWarningText = "Zu wenig freier RAM für große Modelle.";
         }
 
         MemoryWarning = free < LowMemoryThresholdGb;
-        MemoryBarPercent = total > 0 ? Math.Clamp(free / total * 100.0, 0.0, 100.0) : 0.0;
     }
 
     private async Task RefreshMemoryLiveAsync()

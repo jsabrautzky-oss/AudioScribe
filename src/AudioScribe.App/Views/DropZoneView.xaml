@@ -40,9 +40,34 @@
                         Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
                     <StackPanel>
                         <ui:TextBlock FontTypography="Body" Text="{Binding MemoryLabel, Mode=OneWay}" />
-                        <ProgressBar Height="8" Maximum="100" Margin="0,6,0,0"
-                                     Value="{Binding MemoryBarPercent, Mode=OneWay}"
-                                     Foreground="{Binding MemoryWarning, Converter={StaticResource WarnBrush}}" />
+                        <ProgressBar Height="8" Margin="0,6,0,0"
+                                     Value="{Binding UsedMemoryGb, Mode=OneWay}"
+                                     Maximum="{Binding TotalMemoryGb, Mode=OneWay}"
+                                     Foreground="{Binding MemoryWarning, Converter={StaticResource WarnBrush}}">
+                            <ProgressBar.Style>
+                                <Style TargetType="ProgressBar">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MemoryIsVram}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ProgressBar.Style>
+                        </ProgressBar>
+                        <ProgressBar Height="8" Margin="0,6,0,0" Visibility="Collapsed"
+                                     Value="{Binding UsedVramGb, Mode=OneWay}"
+                                     Maximum="{Binding TotalVramGb, Mode=OneWay}"
+                                     Foreground="{Binding MemoryWarning, Converter={StaticResource WarnBrush}}">
+                            <ProgressBar.Style>
+                                <Style TargetType="ProgressBar">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MemoryIsVram}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ProgressBar.Style>
+                        </ProgressBar>
                         <ui:TextBlock FontTypography="Caption" Margin="0,4,0,0" TextWrapping="Wrap"
                                       Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                                       Visibility="{Binding MemoryWarning, Converter={StaticResource BoolToVis}}"
