@@ -1,5 +1,5 @@
 #define MyAppName "AudioScribe"
-#define MyAppVersion "0.1.2"
+#define MyAppVersion "0.1.3"
 #define MyAppPublisher "AudioScribe"
 #define MyAppExeName "AudioScribe.exe"
 #define MyAppIcon "..\src\AudioScribe.App\Assets\app_icon.ico"
@@ -18,7 +18,7 @@ AllowNoIcons=yes
 DisableProgramGroupPage=yes
 DisableWelcomePage=no
 OutputDir=..\dist
-OutputBaseFilename=AudioScribe-Setup-v0.1.2
+OutputBaseFilename=AudioScribe-Setup-v0.1.3
 SetupIconFile={#MyAppIcon}
 UninstallDisplayName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}

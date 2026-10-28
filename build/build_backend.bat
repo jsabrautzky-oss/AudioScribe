@@ -28,6 +28,8 @@ echo Building backend with PyInstaller (das kann mehrere Minuten dauern)...
   --name "audioscribe-backend" ^
   --distpath "%TEMP_DIST%" ^
   --workpath "%WORK%" ^
+  --collect-all pyannote.audio ^
+  --collect-all whisperx ^
   --copy-metadata torchcodec ^
   --copy-metadata transformers ^
   --copy-metadata huggingface-hub ^
