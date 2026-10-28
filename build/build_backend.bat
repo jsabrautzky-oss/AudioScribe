@@ -28,6 +28,11 @@ echo Building backend with PyInstaller (das kann mehrere Minuten dauern)...
   --name "audioscribe-backend" ^
   --distpath "%TEMP_DIST%" ^
   --workpath "%WORK%" ^
+  --copy-metadata torchcodec ^
+  --copy-metadata transformers ^
+  --copy-metadata huggingface-hub ^
+  --copy-metadata pyannote.audio ^
+  --copy-metadata whisperx ^
   "%ENTRY%"
 if errorlevel 1 (
   echo ERROR: PyInstaller-Fehlgeschlagen.
