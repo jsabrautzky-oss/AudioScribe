@@ -71,12 +71,14 @@ public partial class DropZoneViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowGpuDownloadButton))]
     [NotifyPropertyChangedFor(nameof(ShowGpuSuccess))]
+    [NotifyPropertyChangedFor(nameof(UseGpuMode))]
     private bool _hasCudaRuntime;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowGpuArea))]
     [NotifyPropertyChangedFor(nameof(ShowGpuPrompt))]
     [NotifyPropertyChangedFor(nameof(ShowGpuDownloadButton))]
+    [NotifyPropertyChangedFor(nameof(UseGpuMode))]
     private bool _hasNvidiaGpu;
 
     [ObservableProperty]
@@ -93,6 +95,22 @@ public partial class DropZoneViewModel : ObservableObject
 
     [ObservableProperty]
     private double _gpuDownloadProgress;
+
+    [ObservableProperty]
+    private string _memoryLabel = string.Empty;
+
+    [ObservableProperty]
+    private double _memoryBarPercent;
+
+    [ObservableProperty]
+    private bool _memoryWarning;
+
+    [ObservableProperty]
+    private string _memoryWarningText = string.Empty;
+
+    private const double LowMemoryThresholdGb = 4.0;
+
+    public bool UseGpuMode => HasNvidiaGpu && HasCudaRuntime;
 
     public bool ShowGpuProgress => IsGpuAddonDownloading;
     public bool ShowGpuPrompt => HasNvidiaGpu && !HasCudaRuntime && !IsGpuAddonDownloading && _gpuAddon.HasPackageConfigured;
@@ -119,7 +137,10 @@ public partial class DropZoneViewModel : ObservableObject
     private readonly IAppConfigStore _configStore;
     private readonly HardwareDetectorService _hardware;
     private readonly IGpuAddonService _gpuAddon;
+    private readonly SystemMemoryService _memory;
     private readonly Dispatcher _dispatcher;
+    private readonly DispatcherTimer? _memoryTimer;
+    private bool _memoryRefreshBusy;
     private CancellationTokenSource? _gpuCts;
 
     public void NotifyStart()
@@ -195,16 +216,61 @@ public partial class DropZoneViewModel : ObservableObject
             GpuBannerMessage = $"NVIDIA GPU erkannt ({_hardware.NvidiaGpuName}), aber kein CUDA-Addon installiert.";
         else
             GpuBannerMessage = string.Empty;
+
+        RefreshMemoryDisplay();
+        _ = RefreshMemoryLiveAsync();
+    }
+
+    /// <summary>Setzt Label/Balken/Warnung aus dem zuletzt ermittelten RAM/VRAM-Zustand.</summary>
+    private void RefreshMemoryDisplay()
+    {
+        double free;
+        double total;
+        if (UseGpuMode && _memory.HasVramInfo)
+        {
+            free = _memory.FreeVramGb;
+            total = _memory.TotalVramGb;
+            MemoryLabel = $"Freier Grafikspeicher (VRAM): {free:0.#} GB / {total:0.#} GB";
+            MemoryWarningText = "Zu wenig freier VRAM für große Modelle.";
+        }
+        else
+        {
+            free = _memory.FreeMemoryGb;
+            total = _memory.TotalMemoryGb;
+            MemoryLabel = $"Freier Arbeitsspeicher (RAM): {free:0.#} GB / {total:0.#} GB";
+            MemoryWarningText = "Zu wenig freier RAM für große Modelle.";
+        }
+
+        MemoryWarning = free < LowMemoryThresholdGb;
+        MemoryBarPercent = total > 0 ? Math.Clamp(free / total * 100.0, 0.0, 100.0) : 0.0;
+    }
+
+    private async Task RefreshMemoryLiveAsync()
+    {
+        if (_memoryRefreshBusy)
+            return;
+        _memoryRefreshBusy = true;
+        try
+        {
+            await _memory.RefreshAsync();
+            _ = _dispatcher.BeginInvoke(RefreshMemoryDisplay);
+        }
+        finally
+        {
+            _memoryRefreshBusy = false;
+        }
     }
 
     public DropZoneViewModel(
         IAppConfigStore configStore,
         HardwareDetectorService hardware,
-        IGpuAddonService gpuAddon)
+        IGpuAddonService gpuAddon,
+        SystemMemoryService memory)
     {
         _configStore = configStore;
         _hardware = hardware;
         _gpuAddon = gpuAddon;
+        _memory = memory;
         _dispatcher = Dispatcher.CurrentDispatcher;
 
         var stored = configStore.GetHfToken();
@@ -216,6 +282,10 @@ public partial class DropZoneViewModel : ObservableObject
 
         _gpuAddon.Progress += OnGpuAddonProgress;
         RefreshGpuState();
+
+        _memoryTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        _memoryTimer.Tick += (_, _) => _ = RefreshMemoryLiveAsync();
+        _memoryTimer.Start();
     }
 
     public void SetFile(string path)

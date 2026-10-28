@@ -15,22 +15,12 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        DispatcherUnhandledException += (_, args) =>
-        {
-            try
-            {
-                var log = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "AudioScribe", "error.log");
-                Directory.CreateDirectory(Path.GetDirectoryName(log)!);
-                File.AppendAllText(log, $"[{DateTime.Now:O}] {args.Exception}\n\n");
-            }
-            catch { /* nur Best Effort */ }
-        };
+        DispatcherUnhandledException += OnUnhandledException;
 
         var services = new ServiceCollection();
         services.AddSingleton<IAppConfigStore, AppDataConfigStore>();
         services.AddSingleton<HardwareDetectorService>();
+        services.AddSingleton<SystemMemoryService>();
         services.AddSingleton<IGpuAddonService, GpuAddonService>();
         services.AddSingleton<IBackendService, BackendRunnerService>();
         services.AddSingleton<IAudioPlayerService>(_ => new AudioPlayerService(Dispatcher));
@@ -50,6 +40,26 @@ public partial class App : Application
         };
         MainWindow = window;
         window.Show();
+    }
+
+    private void OnUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        try
+        {
+            var log = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "AudioScribe", "app_crash.log");
+            Directory.CreateDirectory(Path.GetDirectoryName(log)!);
+            File.AppendAllText(log, $"[{DateTime.Now:O}] {e.Exception}\n\n");
+        }
+        catch { /* nur Best Effort */ }
+
+        MessageBox.Show(
+            $"Ein unerwarteter Fehler ist aufgetreten und wurde abgefangen.\n\nDetails: {Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\AudioScribe\\app_crash.log",
+            "AudioScribe - Unerwarteter Fehler",
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+        e.Handled = true;
     }
 
     /// <summary>Beim App-Exit Backend-Baum killen, damit keine Python/CUDA-Prozesse VRAM blockieren.</summary>

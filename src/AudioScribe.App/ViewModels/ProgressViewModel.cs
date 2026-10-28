@@ -28,7 +28,7 @@ public partial class ProgressViewModel : ObservableObject
     private bool _hasError;
 
     /// <summary>0-basiertes Stepper-Ziel: 0..3 = vier Phasen, 4 = fertig.</summary>
-    public int PhaseIndex => Current.Phase switch
+    public int PhaseIndex => Current?.Phase switch
     {
         ProcessingPhase.AudioAnalysis => 0,
         ProcessingPhase.Transcription => 1,
@@ -41,7 +41,7 @@ public partial class ProgressViewModel : ObservableObject
     partial void OnCurrentChanged(ProcessProgress value)
     {
         OnPropertyChanged(nameof(PhaseIndex));
-        PhaseMessage = value.StatusMessage;
+        PhaseMessage = value?.StatusMessage ?? "Warte auf Backend…";
     }
 
     public event Action? CancelRequested;
@@ -52,11 +52,16 @@ public partial class ProgressViewModel : ObservableObject
 
     public void BeginRun()
     {
+        Current = new ProcessProgress
+        {
+            Phase = ProcessingPhase.AudioAnalysis,
+            Percent = 0,
+            StatusMessage = "Audioanalyse…",
+        };
         ErrorText = string.Empty;
         HasError = false;
         InfoText = string.Empty;
         OverallPercent = 0;
-        Current = new ProcessProgress { Phase = ProcessingPhase.AudioAnalysis };
         IsRunning = true;
     }
 

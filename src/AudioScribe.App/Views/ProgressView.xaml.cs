@@ -11,7 +11,8 @@ public partial class ProgressView : UserControl
     private static readonly string[] StepNames = ["Step0", "Step1", "Step2", "Step3"];
     private Border[] _steps = [];
 
-    private ProgressViewModel Vm => (ProgressViewModel)DataContext;
+    private ProgressViewModel? Vm => DataContext as ProgressViewModel;
+    private ProgressViewModel? _subscribedVm;
 
     public ProgressView()
     {
@@ -23,10 +24,17 @@ public partial class ProgressView : UserControl
         };
         DataContextChanged += (_, _) =>
         {
-            if (DataContext is ProgressViewModel vm)
+            if (_subscribedVm != null)
+                _subscribedVm.PropertyChanged -= OnVmChanged;
+            _subscribedVm = DataContext as ProgressViewModel;
+            if (_subscribedVm != null)
             {
-                vm.PropertyChanged += OnVmChanged;
-                UpdateVisual(vm);
+                _subscribedVm.PropertyChanged += OnVmChanged;
+                UpdateVisual(_subscribedVm);
+            }
+            else
+            {
+                UpdateVisual(null);
             }
         };
     }
@@ -37,23 +45,34 @@ public partial class ProgressView : UserControl
             or nameof(ProgressViewModel.IsRunning)
             or nameof(ProgressViewModel.HasError))
         {
-            Dispatcher.Invoke(() => UpdateVisual(Vm));
+            Dispatcher.Invoke(() => UpdateVisual(sender as ProgressViewModel));
         }
     }
 
-    private void UpdateVisual(ProgressViewModel vm)
+    private void UpdateVisual(ProgressViewModel? vm)
     {
+        if (vm == null || vm.Current == null)
+            return;
+
         var accent = TryFindResource("AccentFillColorDefaultBrush") as Brush
                      ?? Brushes.DodgerBlue;
         var card = TryFindResource("CardBackgroundFillColorDefaultBrush") as Brush
                    ?? Brushes.Transparent;
+        int phaseIndex = vm.PhaseIndex;
         for (int i = 0; i < _steps.Length; i++)
-            _steps[i].Background = i <= vm.PhaseIndex ? accent : card;
+        {
+            var step = _steps[i];
+            if (step == null)
+                continue;
+            step.Background = i <= phaseIndex ? accent : card;
+        }
 
-        CancelButton.Visibility = vm.IsRunning ? Visibility.Visible : Visibility.Collapsed;
-        BackButton.Visibility = vm.IsRunning ? Visibility.Collapsed : Visibility.Visible;
+        if (CancelButton != null)
+            CancelButton.Visibility = vm.IsRunning ? Visibility.Visible : Visibility.Collapsed;
+        if (BackButton != null)
+            BackButton.Visibility = vm.IsRunning ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void OnCancelClick(object sender, RoutedEventArgs e) => Vm.NotifyCancel();
-    private void OnBackClick(object sender, RoutedEventArgs e) => Vm.NotifyBack();
+    private void OnCancelClick(object sender, RoutedEventArgs e) => Vm?.NotifyCancel();
+    private void OnBackClick(object sender, RoutedEventArgs e) => Vm?.NotifyBack();
 }
