@@ -76,7 +76,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="large-v3 | large-v3-turbo | groesserere faster-whisper-Architekturen")
     t.add_argument("--out-dir", required=True, help="Session-Verzeichnis (Temp)")
     t.add_argument("--hf-token", default=None, help="Hugging-Face-Token fuer pyannote")
-    t.add_argument("--language", default="de")
+    t.add_argument("--language", default="de",
+                   help="feste Zielsprache (ISO-Code), Standard: de; verhindert Sprachautomatik")
     t.add_argument("--min-speakers", type=int, default=None)
     t.add_argument("--max-speakers", type=int, default=None)
     t.add_argument("--batch-size", type=int, default=16)

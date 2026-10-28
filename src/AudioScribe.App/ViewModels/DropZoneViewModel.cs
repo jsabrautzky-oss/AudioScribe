@@ -12,6 +12,8 @@ namespace AudioScribe.App.ViewModels;
 /// <summary>Startbildschirm: Datei (Drag&Drop/Picker), HF-Token (DPAPI), Modell, Min/Max-Sprecher.</summary>
 public partial class DropZoneViewModel : ObservableObject
 {
+    /// <summary>Modell-Eintrag mit Anzeigename (UI) und CLI-/HF-Bezeichner (Value).</summary>
+    public sealed record ModelOption(string DisplayName, string Value);
     public const string AllowedExtensions = ".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.wma";
 
     [ObservableProperty]
@@ -117,7 +119,14 @@ public partial class DropZoneViewModel : ObservableObject
     public bool ShowGpuSuccess => HasCudaRuntime;
     public bool ShowGpuDownloadButton => ShowGpuPrompt;
 
-    public ObservableCollection<string> AvailableModels { get; } = ["large-v3", "large-v3-turbo", "medium", "small"];
+    public ObservableCollection<ModelOption> AvailableModels { get; } =
+    [
+        new("large-v3", "large-v3"),
+        new("large-v3-german (Beste deutsche Erkennung)", "primeline/whisper-large-v3-german-ct2"),
+        new("large-v3-turbo", "large-v3-turbo"),
+        new("medium", "medium"),
+        new("small", "small"),
+    ];
 
     public bool HasFile => !string.IsNullOrEmpty(FilePath);
 

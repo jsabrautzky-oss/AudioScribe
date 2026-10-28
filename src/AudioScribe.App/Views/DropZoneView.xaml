@@ -147,7 +147,9 @@
                             <ui:TextBlock FontTypography="BodyStrong" Text="Whisper-Modell" />
                             <ComboBox Width="220" Margin="0,6,0,0" HorizontalAlignment="Left"
                                       ItemsSource="{Binding AvailableModels}"
-                                      SelectedItem="{Binding SelectedModel}" />
+                                      DisplayMemberPath="DisplayName"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding SelectedModel}" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="16,0,0,0">
                             <ui:TextBlock FontTypography="BodyStrong" Text="Min. Sprecher" />

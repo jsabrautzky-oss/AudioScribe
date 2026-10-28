@@ -19,6 +19,18 @@ ProgressFn = Callable[[str, float, str], None]
 
 BATCH_ATTEMPTS = (16, 4, 1)
 
+# Neutraler Universal-Prompt je Zielsprache: kalibriert den Whisper-Decoder auf
+# Groß-/Kleinschreibung und Umlaute, um Fehler wie "Durken" statt "Drücken" zu mindern.
+UNIVERSAL_PROMPTS = {
+    "de": "Transkription auf Deutsch. Bitte auf korrekte Groß- und Kleinschreibung sowie Umlaute (ä, ö, ü, ß) achten.",
+}
+
+
+def _initial_prompt_for(language: str | None) -> str | None:
+    if not language:
+        return None
+    return UNIVERSAL_PROMPTS.get(language.split("-")[0].lower())
+
 
 class HfResourceError(RuntimeError):
     pass
@@ -199,6 +211,8 @@ def transcribe(
     enthalten start/end/text und (nach Alignment) words[] mit Wort-Timestamps."""
     import gc
 
+    language = (language or "de").strip() or "de"
+
     import torch
     from whisperx.audio import load_audio
 
@@ -237,10 +251,15 @@ def transcribe(
             from whisperx.asr import load_model
 
             vad_model = _make_cached_vad(vad_segments)
+            asr_options: dict = {}
+            prompt = _initial_prompt_for(language)
+            if prompt is not None:
+                asr_options["initial_prompt"] = prompt
             model = load_model(
                 model_name, device, compute_type=compute_type,
                 vad_model=vad_model, language=language, threads=4,
                 vad_options={"vad_onset": 0.5, "vad_offset": 0.363, "chunk_size": 30},
+                asr_options=asr_options or None,
             )
 
             def cb(pct: float):
