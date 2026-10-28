@@ -122,10 +122,12 @@ public partial class DropZoneViewModel : ObservableObject
     public ObservableCollection<ModelOption> AvailableModels { get; } =
     [
         new("large-v3", "large-v3"),
-        new("large-v3-german (Beste deutsche Erkennung)", "primeline/whisper-large-v3-german-ct2"),
         new("large-v3-turbo", "large-v3-turbo"),
         new("medium", "medium"),
         new("small", "small"),
+        new("DE: Tiny (scheidti - Ultraschnell & <1 GB RAM)", "scheidti/whisper-tiny-german-1224-ct2"),
+        new("DE: Large V3 Turbo (tnfru - Schnell)", "tnfru/whisper-large-v3-turbo-german-ct2"),
+        new("DE: Large V3 (tnfru - Höchste Präzision)", "tnfru/whisper-large-v3-german-ct2"),
     ];
 
     public bool HasFile => !string.IsNullOrEmpty(FilePath);

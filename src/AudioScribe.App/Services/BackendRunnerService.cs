@@ -135,6 +135,12 @@ public sealed class BackendRunnerService : IBackendService
             "--out-dir", sessionDir,
         })
             psi.ArgumentList.Add(arg);
+        if (model.Contains("german", StringComparison.OrdinalIgnoreCase)
+            || model.Contains("scheidti", StringComparison.OrdinalIgnoreCase))
+        {
+            psi.ArgumentList.Add("--language");
+            psi.ArgumentList.Add("de");
+        }
         if (!string.IsNullOrWhiteSpace(hfToken))
         {
             psi.ArgumentList.Add("--hf-token");
